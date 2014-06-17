@@ -15,7 +15,8 @@ module Ransack
 
     def initialize(object, params = {}, options = {})
       params = {} unless params.is_a?(Hash)
-      params.delete_if { |k, v| v.blank? && v != false }
+      (params ||= {})
+      .delete_if { |k, v| [*v].all? { |i| i.blank? && i != false } }
       @context = Context.for(object, options)
       @context.auth_object = options[:auth_object]
       @base = Nodes::Grouping.new(@context, 'and')
@@ -28,11 +29,12 @@ module Ransack
 
     def build(params)
       collapse_multiparameter_attributes!(params).each do |key, value|
-        case key
-        when 's', 'sorts'
+        if ['s', 'sorts'].include?(key)
           send("#{key}=", value)
-        else
-          base.send("#{key}=", value) if base.attribute_method?(key)
+        elsif base.attribute_method?(key)
+          base.send("#{key}=", value)
+        elsif !Ransack.options[:ignore_unknown_conditions]
+          raise ArgumentError, "Invalid search term #{key}"
         end
       end
       self
@@ -57,7 +59,8 @@ module Ransack
       when String
         self.sorts = [args]
       else
-        raise ArgumentError, "Invalid argument (#{args.class}) supplied to sorts="
+        raise ArgumentError,
+        "Invalid argument (#{args.class}) supplied to sorts="
       end
     end
     alias :s= :sorts=

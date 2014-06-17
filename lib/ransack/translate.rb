@@ -60,7 +60,7 @@ module Ransack
         [:"#{context.klass.i18n_scope}.models.#{i18n_key(context.klass)}"] :
         [:"ransack.associations.#{i18n_key(context.klass)}.#{key}"]
       defaults << context.traverse(key).model_name.human
-      options = {:count => 1, :default => defaults}
+      options = { :count => 1, :default => defaults }
       I18n.translate(defaults.shift, options)
     end
 
@@ -72,10 +72,9 @@ module Ransack
       attr_name = name.sub(/^#{assoc_path}_/, '')
       interpolations = {}
       interpolations[:attr_fallback_name] = I18n.translate(
-        (associated_class ?
-          :"ransack.attributes.#{i18n_key(associated_class)}.#{attr_name}" :
-          :"ransack.attributes.#{i18n_key(context.klass)}.#{attr_name}"
-        ),
+        :"ransack.attributes.#{
+          i18n_key(associated_class || context.klass)
+          }.#{attr_name}",
         :default => [
           (
             if associated_class
@@ -90,9 +89,7 @@ module Ransack
           attr_name.humanize
         ]
       )
-      defaults = [
-        :"ransack.attributes.#{i18n_key(context.klass)}.#{name}"
-      ]
+      defaults = [:"ransack.attributes.#{i18n_key(context.klass)}.#{name}"]
       if include_associations && associated_class
         defaults << '%{association_name} %{attr_fallback_name}'
         interpolations[:association_name] = association(
@@ -101,7 +98,7 @@ module Ransack
       else
         defaults << '%{attr_fallback_name}'
       end
-      options = {:count => 1, :default => defaults}
+      options = { :count => 1, :default => defaults }
       I18n.translate(defaults.shift, options.merge(interpolations))
     end
 

@@ -107,8 +107,9 @@ module Ransack
 
       def predicate_select(options = {}, html_options = {})
         options[:compounds] = true if options[:compounds].nil?
-        default = options.delete(:default) || 'eq'
-        keys = options[:compounds] ? Predicate.names : 
+        default = options.delete(:default) || 'cont'
+
+        keys = options[:compounds] ? Predicate.names :
           Predicate.names.reject { |k| k.match(/_(any|all)$/) }
         if only = options[:only]
           if only.respond_to? :call
@@ -127,8 +128,7 @@ module Ransack
 
       def combinator_select(options = {}, html_options = {})
         template_collection_select(
-          :m, combinator_choices, options, html_options
-          )
+          :m, combinator_choices, options, html_options)
       end
 
       private
