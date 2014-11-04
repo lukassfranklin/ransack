@@ -230,10 +230,10 @@ module Ransack
           ['predicate', p],
           ['combinator', m],
           ['values', v.try(:map, &:value)]
-        ]
-        .reject { |e| e[1].blank? }
-        .map { |v| "#{v[0]}: #{v[1]}" }
-        .join(', ')
+        ].
+        reject { |e| e[1].blank? }.
+        map { |v| "#{v[0]}: #{v[1]}" }.
+        join(', ')
         "Condition <#{data}>"
       end
 
